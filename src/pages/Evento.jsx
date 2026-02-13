@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import CardEvento from "../components/CardEvento";
 
 export default function Evento({ eventos, onRemover, titulo }) {
@@ -19,13 +19,15 @@ export default function Evento({ eventos, onRemover, titulo }) {
     <section className="stack">
       <h2>Eventos</h2>
 
-      <label> Buscar por titulo
-        <input type="text" value={filtroTitulo} onChange={(e) => setFiltroTitulo(e.target.value)}></input>
-      </label>
+      <div className="filtros-posicao">
+        <label> Buscar por titulo
+          <input type="text" value={filtroTitulo} onChange={(e) => setFiltroTitulo(e.target.value)}></input>
+        </label>
 
-      <label> Filtrar por local
-        <input type="text" value={filtroLocal} onChange={(e) => setFiltroLocal(e.target.value)} />
-      </label>
+        <label> Filtrar por local
+          <input type="text" value={filtroLocal} onChange={(e) => setFiltroLocal(e.target.value)} />
+        </label>
+      </div>
 
       {eventos.length === 0 ? (
         <p className="muted">Nenhum evento cadastrado. Vá em “Cadastrar”.</p>
@@ -38,7 +40,7 @@ export default function Evento({ eventos, onRemover, titulo }) {
         </div>
       )}
 
-      <button className="btn ghost" onClick={() => removerEventos()}>Remover todos</button>
+      <button className="btn danger" onClick={() => removerEventos()}>Remover todos</button>
     </section>
   );
 }

@@ -70,7 +70,7 @@ body {
 .grid {
     display: grid;
     gap: 12px;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
 }
 
 .card {
@@ -148,4 +148,20 @@ input {
     border-top: 1px solid #1b2634;
     color: #9fb2c8;
     text-align: center;
+}
+
+.filtros-posicao {
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.botoes  {
+    display: grid;
+    gap: 10px;
+}
+
+.btnEvento {
+    width: 100px;
 }

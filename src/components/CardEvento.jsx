@@ -1,5 +1,5 @@
 import React from "react";
-import {useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import abertoImg from '../Imagens/Aberto.png'
 import lotadoImg from '../Imagens/Lotado.png'
 
@@ -11,7 +11,7 @@ export default function CardEvento({ evento, onRemover }) {
     navigate('../evento/' + evento.id)
   }
   const edit = (eventoId) => {
-    navigate('../cadastrar', {state : {eventoId}})
+    navigate('../cadastrar', { state: { eventoId } })
   }
 
   // Mudar de acordo com aberto ou lotado
@@ -28,16 +28,17 @@ export default function CardEvento({ evento, onRemover }) {
           <br></br>
           {evento.descricao}
           <br />
-          <img src={badge} alt=""/>
+          <img src={badge} alt="" />
         </p>
       </div>
-
-      <button className="btn danger" onClick={() => onRemover(evento.id)}>
-        Remover
-      </button>
-      <button className="btn" onClick={() => edit(evento.id)}>
-        Editar
-      </button>
+      <div className="botoes">
+        <button className="btn btnEvento"  onClick={() => edit(evento.id)}>
+          Editar
+        </button>
+        <button className="btn danger btnEvento" onClick={() => onRemover(evento.id)}>
+          Remover
+        </button>
+      </div>
     </article>
   );
 }
