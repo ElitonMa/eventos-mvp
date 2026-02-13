@@ -20,6 +20,8 @@ export default function EventoDetalhes({ eventos }) {
                 Local: <strong>{eventos[eId - 1].local}</strong>
                 <p></p>
                 Descrição: <strong>{eventos[eId - 1].descricao}</strong>
+                <p></p>
+                Status: <strong>{eventos[eId - 1].status}</strong>
             </div>
             <p></p>
             <button className="btn ghost" onClick={() => voltar()}>Voltar</button>

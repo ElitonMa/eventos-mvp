@@ -1,5 +1,7 @@
 import React from "react";
 import {useNavigate } from "react-router-dom";
+import abertoImg from '../Imagens/Aberto.png'
+import lotadoImg from '../Imagens/Lotado.png'
 
 export default function CardEvento({ evento, onRemover }) {
 
@@ -11,7 +13,10 @@ export default function CardEvento({ evento, onRemover }) {
   const edit = (eventoId) => {
     navigate('../cadastrar', {state : {eventoId}})
   }
-  
+
+  // Mudar de acordo com aberto ou lotado
+  let badge
+  evento.status === "Aberto" ? badge = abertoImg : badge = lotadoImg
 
   return (
     <article className="card" >
@@ -19,9 +24,11 @@ export default function CardEvento({ evento, onRemover }) {
         <h3>{evento.titulo}</h3>
         <p className="muted">
           {evento.data} • {evento.local}
-          
+          <br />
           <br></br>
           {evento.descricao}
+          <br />
+          <img src={badge} alt=""/>
         </p>
       </div>
 

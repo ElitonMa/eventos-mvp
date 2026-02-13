@@ -17,24 +17,31 @@ export default function CadastroEvento({ onAdd, eventos }) {
   function handleSubmit(e) {
     e.preventDefault();
 
-    if (!titulo || !data || !local || !descricao) {
+    if ((!titulo || !data || !local || !descricao) && eventoId === undefined) {
       alert("Preencha todos os campos.");
       return;
     }
 
+    // Verificação de editar o evento
     if (eventoId !== undefined) {
-      eventos[eventoId-1].titulo = titulo
-      eventos[eventoId-1].data = data
-      eventos[eventoId-1].local = local
-      eventos[eventoId-1].descricao = descricao
-      eventos[eventoId-1].status = status
+      const form = document.getElementById("formularioCadastro")
+      const elementos = form.elements
+
+      for (let i = 0; i < elementos.length; i++) {
+        elementos[i].name === "titulo" && elementos[i].value !== "" ? eventos[eventoId - 1].titulo = titulo : eventos[eventoId - 1].titulo = eventos[eventoId - 1].titulo
+        elementos[i].name === "data" && elementos[i].value !== "" ? eventos[eventoId - 1].data = data : eventos[eventoId - 1].data = eventos[eventoId - 1].data
+        elementos[i].name === "local" && elementos[i].value !== "" ? eventos[eventoId - 1].local = local : eventos[eventoId - 1].local = eventos[eventoId - 1].local
+        elementos[i].name === "descricao" && elementos[i].value !== "" ? eventos[eventoId - 1].descricao = descricao : eventos[eventoId - 1].descricao = eventos[eventoId - 1].descricao
+        if (elementos[i].name === "status" && elementos[i].checked === true) { eventos[eventoId - 1].status = elementos[i].value }
+      }
+      eventos[eventoId - 1].status = status
     }
 
     else {
-      onAdd({ titulo, data, local, descricao });
+      onAdd({ titulo, data, local, descricao, status });
     }
     navigate("/evento");
-    
+
   }
 
   function limparCampos() {
@@ -55,7 +62,7 @@ export default function CadastroEvento({ onAdd, eventos }) {
     }
   }
 
-  
+
 
   return (
     <section className="stack">
@@ -64,30 +71,30 @@ export default function CadastroEvento({ onAdd, eventos }) {
       <form className="form" id="formularioCadastro" onSubmit={handleSubmit}>
         <label>
           Título
-          <input value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Ex: Demo do sistema" />
+          <input value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Ex: Demo do sistema" name="titulo" />
         </label>
 
         <label>
           Data
-          <input type="date" value={data} onChange={(e) => setData(e.target.value)} />
+          <input type="date" value={data} onChange={(e) => setData(e.target.value)} name="data" />
         </label>
 
         <label>
           Local
-          <input type="input" value={local} onChange={(e) => setLocal(e.target.value)} placeholder="Ex: Laboratório" />
+          <input type="input" value={local} onChange={(e) => setLocal(e.target.value)} placeholder="Ex: Laboratório" name="local" />
         </label>
 
         <label>
           Descrição
-          <input value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder="Ex: Testar se o sistema esta funcionando" />
+          <input value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder="Ex: Testar se o sistema esta funcionando" name="descricao" />
         </label>
 
         <label>
           Status <br />
           Aberto
-          <input value="aberto"  type="radio" name="status" onChange={(e) => setStatus(e.target.value)} />
+          <input value="Aberto" type="radio" name="status" onChange={(e) => setStatus(e.target.value)} />
           Lotado
-          <input value="lotado"  type="radio" name="status" onChange={(e) => setStatus(e.target.value)} />
+          <input value="Lotado" type="radio" name="status" onChange={(e) => setStatus(e.target.value)} />
         </label>
 
         <div className="row">
