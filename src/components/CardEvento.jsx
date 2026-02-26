@@ -7,14 +7,19 @@ export default function CardEvento({ evento, onRemover }) {
 
   const navigate = useNavigate()
 
+
+  
+  // Navega até EventoDetalhes, mandando o id para mostrar as informações correspondente
   const info = () => {
     navigate('../evento/' + evento.id)
   }
+
+  // Ao clicar no botão de editar, navega para a página de cadastro mandando o id do evento para poder edita-lo
   const edit = (eventoId) => {
     navigate('../cadastrar', { state: { eventoId } })
   }
 
-  // Mudar de acordo com aberto ou lotado
+  // Mudar para aberto, se estiver aberto, ou lotado caso não
   let badge
   evento.status === "Aberto" ? badge = abertoImg : badge = lotadoImg
 
@@ -26,6 +31,7 @@ export default function CardEvento({ evento, onRemover }) {
           {evento.data} • {evento.local}
           <br />
           <br></br>
+          {/* Mostra a descricao do evento */}
           {evento.descricao}
           <br />
           <img src={badge} alt="" />

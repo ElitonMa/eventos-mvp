@@ -3,15 +3,18 @@ import CardEvento from "../components/CardEvento";
 
 export default function Evento({ eventos, onRemover, titulo }) {
 
+  // Percorre o array dos eventos e remove cada um
   function removerEventos() {
     for (let i = 0; i < eventos.length; i++) {
       onRemover(eventos[i].id)
     }
   }
 
+  // Variaveis para os filtros
   const [filtroTitulo, setFiltroTitulo] = useState("")
   const [filtroLocal, setFiltroLocal] = useState("")
 
+  // Recebe o filtro e mapeia apenas os eventos correspondente ao filtro
   const eventosFiltrados = eventos.filter((e) => e.titulo.toLowerCase().includes(filtroTitulo.toLowerCase()) &&
     e.local.toLowerCase().includes(filtroLocal.toLowerCase()))
 
@@ -20,6 +23,7 @@ export default function Evento({ eventos, onRemover, titulo }) {
       <h2>Eventos</h2>
 
       <div className="filtros-posicao">
+        {/* Buscar por titulo */}
         <label> Buscar por titulo
           <input type="text" value={filtroTitulo} onChange={(e) => setFiltroTitulo(e.target.value)}></input>
         </label>
@@ -33,6 +37,7 @@ export default function Evento({ eventos, onRemover, titulo }) {
         <p className="muted">Nenhum evento cadastrado. Vá em “Cadastrar”.</p>
       ) : (
         <div className="grid">
+          {/* Mapeamento dos eventos filtrados */}
           {eventosFiltrados.map((e) => (
             <CardEvento key={e.id} evento={e} onRemover={onRemover} />
           ))
@@ -40,6 +45,7 @@ export default function Evento({ eventos, onRemover, titulo }) {
         </div>
       )}
 
+      {/* Botão para remover todos os eventos  */}
       <button className="btn danger" onClick={() => removerEventos()}>Remover todos</button>
     </section>
   );

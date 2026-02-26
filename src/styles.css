@@ -165,3 +165,10 @@ input {
 .btnEvento {
     width: 100px;
 }
+
+.areaText {
+    background-color: #0b0f14;
+    border-color: #1b2634;
+    border-radius: 12px;
+    color: white;
+}

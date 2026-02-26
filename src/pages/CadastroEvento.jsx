@@ -13,20 +13,27 @@ export default function CadastroEvento({ onAdd, eventos }) {
   const [local, setLocal] = useState("");
   const [descricao, setDescricao] = useState("");
   const [status, setStatus] = useState("");
+  const [capacidadeTotal, setCapacidadeTotal] = useState("")
+  const [mapaUrl, setMapaUrl] = useState("");
+  const [fotosTexto, setFotosTexto] = useState("");
+  const [vagas, setVagas] = useState("");
+
 
   function handleSubmit(e) {
     e.preventDefault();
 
-    if ((!titulo || !data || !local || !descricao) && eventoId === undefined) {
+    // Verifica se os campos estão em branco e se o id do evento for indefinido (evento não selecionado para editar)
+    if ((!titulo || !data || !local || !descricao || !capacidadeTotal || !mapaUrl || !fotosTexto) && eventoId === undefined) {
       alert("Preencha todos os campos.");
       return;
     }
 
-    // Verificação de editar o evento
+    // Verificação de editar o evento, caso esteja um evento selecionado
     if (eventoId !== undefined) {
       const form = document.getElementById("formularioCadastro")
       const elementos = form.elements
 
+      // Percorre os elementos e verifica se eles estão em branco, caso estejam em branco ele apenas mantém o valor atual, caso não esteja, ele atualiza com o valor colocado no campo
       for (let i = 0; i < elementos.length; i++) {
         elementos[i].name === "titulo" && elementos[i].value !== "" ? eventos[eventoId - 1].titulo = titulo : eventos[eventoId - 1].titulo = eventos[eventoId - 1].titulo
         elementos[i].name === "data" && elementos[i].value !== "" ? eventos[eventoId - 1].data = data : eventos[eventoId - 1].data = eventos[eventoId - 1].data
@@ -37,23 +44,34 @@ export default function CadastroEvento({ onAdd, eventos }) {
       eventos[eventoId - 1].status = status
     }
 
+    // Caso não tenha um evento selecionado
     else {
-      onAdd({ titulo, data, local, descricao, status });
+      onAdd({ titulo, data, local, descricao, status, mapaUrl, fotosTexto, capacidadeTotal, vagas });
+      setVagas(capacidadeTotal)
     }
+
+    const textArea = document.getElementById("fotosArea");
+    const linhas = textArea.value.split(/\r?\n/);
+
+    
     navigate("/evento");
 
   }
 
+  // Função para limpar os campos do formulário
   function limparCampos() {
     const form = document.getElementById("formularioCadastro")
     const elementos = form.elements;
-
+    
     // Limpar valores colocados
     setData("")
     setTitulo("")
     setLocal("")
     setDescricao("")
-
+    setFotosTexto("")
+    setCapacidadeTotal("")
+    setMapaUrl("")
+    
     // Limpar cada valor do formulário
     for (let i = 0; i < elementos.length; i++) {
       if (elementos[i].type === "text" || elementos[i].type === "date") {
@@ -61,8 +79,6 @@ export default function CadastroEvento({ onAdd, eventos }) {
       }
     }
   }
-
-
 
   return (
     <section className="stack">
@@ -97,12 +113,27 @@ export default function CadastroEvento({ onAdd, eventos }) {
           <input value="Lotado" type="radio" name="status" onChange={(e) => setStatus(e.target.value)} />
         </label>
 
+        <label>
+          Capacidade total
+          <input type="number" min="0" value={capacidadeTotal} name="capacidade" onChange={(e) => setCapacidadeTotal(e.target.value)}/>
+        </label>
+        
+        <label>
+          Url mapa
+          <input type="text" value={mapaUrl} name="mapa" onChange={(e) => setMapaUrl(e.target.value)}/>
+        </label>
+        
+        <label>
+          Fotos
+          <textarea type="number" value={fotosTexto} name="fotos" onChange={(e) => setFotosTexto(e.target.value)} className="areaText" id="fotosArea"/>
+        </label>
+
         <div className="row">
           <button className="btn" type="submit">Salvar</button>
           <button className="btn ghost" type="button" onClick={() => navigate("/evento")}>
             Cancelar
           </button>
-          <button className="btn ghost" type="button" onClick={() => limparCampos()}>
+          <button className="btn danger" type="button" onClick={() => limparCampos()}>
             Limpar formulário
           </button>
         </div>
