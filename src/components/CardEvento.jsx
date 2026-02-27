@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import abertoImg from '../Imagens/Aberto.png'
-import lotadoImg from '../Imagens/Lotado.png'
+import { Icon } from "@iconify/react";
+import { Badge } from "react-bootstrap";
 
 export default function CardEvento({ evento, onRemover }) {
 
@@ -15,13 +15,11 @@ export default function CardEvento({ evento, onRemover }) {
   }
 
   // Ao clicar no botão de editar, navega para a página de cadastro mandando o id do evento para poder edita-lo
-  const edit = (eventoId) => {
-    navigate('../cadastrar', { state: { eventoId } })
+  const edit = (eId) => {
+    navigate('../cadastrar', { state: { eId } })
   }
-
+  
   // Mudar para aberto, se estiver aberto, ou lotado caso não
-  let badge
-  evento.status === "Aberto" ? badge = abertoImg : badge = lotadoImg
 
   return (
     <article className="card" >
@@ -34,7 +32,9 @@ export default function CardEvento({ evento, onRemover }) {
           {/* Mostra a descricao do evento */}
           {evento.descricao}
           <br />
-          <img src={badge} alt="" />
+          <Icon icon="material-symbols:person" fontSize={20} inline={true}></Icon> {evento.vagas}
+          <br />
+          <Badge className={evento.status === "Aberto" ? "badge-bt-success" : "badge-bt-danger"}>{evento.status}</Badge>
         </p>
       </div>
       <div className="botoes">

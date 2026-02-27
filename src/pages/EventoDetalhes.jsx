@@ -9,29 +9,41 @@ export default function EventoDetalhes({ eventos }) {
     const voltar = () => (
         navigate("../evento")
     )
-
+    
     return (
         <div>
             <h1>Informações sobre o evento</h1>
             <div className="informacoes">
                 {/* Mostra o titulo, data, local, descrição e status do evento selecionado */}
-                Titulo: <big>{eventos[eId - 1].titulo}</big>
+                Titulo: <big>{eventos.find(e => e.id === Number(eId)).titulo}</big>
                 <p></p>
-                Data: <strong>{eventos[eId - 1].data}</strong>
+                Data: <strong>{eventos.find(e => e.id === Number(eId)).data}</strong>
                 <p></p>
-                Local: <strong>{eventos[eId - 1].local}</strong>
+                Local: <strong>{eventos.find(e => e.id === Number(eId)).local}</strong>
                 <p></p>
-                Descrição: <strong>{eventos[eId - 1].descricao}</strong>
+                Descrição: <strong>{eventos.find(e => e.id === Number(eId)).descricao}</strong>
                 <p></p>
-                Status: <strong>{eventos[eId - 1].status}</strong>
+                Status: <strong>{eventos.find(e => e.id === Number(eId)).status}</strong>
                 <p></p>
-                Capacidade: <strong>{eventos[eId - 1].capacidadeTotal}</strong>
+                Capacidade: <strong>{eventos.find(e => e.id === Number(eId)).capacidadeTotal}</strong>
                 <p></p>
-                Vagas restantes: <strong>{eventos[eId - 1].vagas}</strong>
+                Vagas restantes: <strong>{eventos.find(e => e.id === Number(eId)).vagas}</strong>
                 <p></p>
-                Mapa: <iframe src={eventos[eId - 1].mapaUrl} width="250" height="150" style={{border:0}} allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                {/* eslint-disable-next-line */}
+                Mapa: <br /><iframe src={eventos.find(e => e.id === Number(eId)).mapaUrl} width="615" height="350" style={{border:0}} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" ></iframe>
                 <p></p>
-                Fotos: <strong><img src={eventos[eId - 1].fotosTexto}></img></strong>
+                Fotos:
+                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                {eventos.find(e => e.id === Number(eId)).fotos?.map((url, index) => (
+                    <img
+                    key={index}
+                    src={url}
+                    alt={`Foto ${index + 1}`}
+                    width="200"
+                    onError={(e) => e.target.style.display = "none"} 
+                    />
+                ))}
+                </div>  
             </div>
             <p></p>
             <button className="btn ghost" onClick={() => voltar()}>Voltar</button>
