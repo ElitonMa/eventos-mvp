@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CardEvento from "../components/CardEvento";
 
 export default function Evento({ eventos, onRemover, titulo }) {
@@ -10,6 +10,20 @@ export default function Evento({ eventos, onRemover, titulo }) {
     }
   }
 
+  const [eventosBanco, setEventosBanco] = useState([])
+
+  useEffect(() => {
+    fetch("http://localhost:3001/eventos")
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error ("Error na rede")
+      }
+      return response.json();
+    })
+    .then ((evento) => {
+      setEventosBanco(evento);
+    })
+  }, []);
   // Variaveis para os filtros
   const [filtroTitulo, setFiltroTitulo] = useState("")
   const [filtroLocal, setFiltroLocal] = useState("")
@@ -38,7 +52,7 @@ export default function Evento({ eventos, onRemover, titulo }) {
       ) : (
         <div className="grid">
           {/* Mapeamento dos eventos filtrados */}
-          {eventosFiltrados.map((e) => (
+          {eventosBanco.map((e) => (
             <CardEvento key={e.id} evento={e} onRemover={onRemover} />
           ))
           }

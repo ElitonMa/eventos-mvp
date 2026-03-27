@@ -1,243 +1,175 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
+import { Icon } from "@iconify/react";
 
-export default function CadastroEvento({
-  onAdd,
-  eventoEditando,
-  onAtualizar,
-  onCancelarEdicao,
-}) {
+export default function CadastroEvento({ onAdd, eventos }) {
+
+  const location = useLocation()
+  const { eId } = location.state || {}
   const navigate = useNavigate();
-
-  // ✅ (JÁ EXISTIA / BASE) States dos campos básicos do formulário
-  // Papel no React: STATE = dados que mudam conforme o usuário digita
   const [titulo, setTitulo] = useState("");
   const [data, setData] = useState("");
   const [local, setLocal] = useState("");
   const [descricao, setDescricao] = useState("");
-
-  // ✅ (ADICIONADO) Novos campos para enriquecer o evento
-  // - capacidadeTotal: para controlar lotação/vagas
-  // - mapaUrl: para embed do Google Maps (iframe na tela do evento)
-  // - fotosTexto: textarea com 1 URL por linha, depois vira array
-  const [capacidadeTotal, setCapacidadeTotal] = useState(0);
+  const [status, setStatus] = useState("");
+  const [capacidadeTotal, setCapacidadeTotal] = useState("")
   const [mapaUrl, setMapaUrl] = useState("");
   const [fotosTexto, setFotosTexto] = useState("");
+  const eventoIndex = eventos.findIndex(e => e.id === Number(eId));
 
-  // ✅ (ADICIONADO) useEffect para modo "editar"
-  // Quando o usuário clica em "Editar" em algum evento,
-  // o form precisa vir preenchido com os dados daquele evento.
-  useEffect(() => {
-    if (eventoEditando) {
-      // Preenche campos básicos
-      setTitulo(eventoEditando.titulo || "");
-      setData(eventoEditando.data || "");
-      setLocal(eventoEditando.local || "");
-      setDescricao(eventoEditando.descricao || "");
-
-      // Preenche novos campos
-      setCapacidadeTotal(Number(eventoEditando.capacidadeTotal || 0));
-      setMapaUrl(eventoEditando.mapaUrl || "");
-
-      // ✅ (ADICIONADO) Se fotos for array, converte para texto (1 por linha)
-      // Isso facilita o aluno editar no textarea.
-      setFotosTexto((eventoEditando.fotos || []).join("\n"));
-    }
-  }, [eventoEditando]);
-
-  // ✅ (ADICIONADO) Função utilitária para "resetar" o formulário
-  // Papel no React: Handler/função auxiliar para limpar states
-  function limpar() {
-    setTitulo("");
-    setData("");
-    setLocal("");
-    setDescricao("");
-    setCapacidadeTotal(0);
-    setMapaUrl("");
-    setFotosTexto("");
-  }
-
-  // ✅ (ADICIONADO) Cancelar: limpa, sai do modo edição (se houver) e navega
-  function cancelar() {
-    limpar();
-
-    // Se estava editando, avisa o componente pai para "sair do modo edição"
-    if (eventoEditando) onCancelarEdicao();
-
-    // Volta para a tela de eventos
-    navigate("/evento");
-  }
-
-  // ✅ (ADICIONADO/MELHORADO) Submit central do formulário
-  // Papel: handler de envio (onSubmit)
   function handleSubmit(e) {
     e.preventDefault();
 
-    // ✅ (ADICIONADO) Validação mínima dos campos obrigatórios
-    if (!titulo || !data || !local || !descricao) {
-      alert("Preencha todos os campos obrigatórios.");
+    // Verifica se os campos estão em branco e se o id do evento for indefinido (evento não selecionado para editar)
+    if ((!titulo || !data || !local || !descricao || !capacidadeTotal || !mapaUrl || !fotosTexto || status === "") && eId === undefined) {
+      alert("Preencha todos os campos.");
       return;
     }
 
-    // ✅ (ADICIONADO) Validação da capacidade
-    const cap = Number(capacidadeTotal);
-    if (!cap || cap <= 0) {
-      alert("Capacidade total precisa ser maior que 0.");
-      return;
+    // Verificação de editar o evento, caso esteja um evento selecionado
+    if (eId !== undefined) {
+      const form = document.getElementById("formularioCadastro")
+      const elementos = form.elements
+
+      // Percorre os elementos e verifica se eles estão em branco, caso estejam em branco ele apenas mantém o valor atual, caso não esteja, ele atualiza com o valor colocado no campo
+      for (let i = 0; i < elementos.length; i++) {
+        elementos[i].name === "titulo" && elementos[i].value !== "" ? eventos[eventoIndex].titulo = titulo : eventos[eventoIndex].titulo = eventos[eventoIndex].titulo
+        elementos[i].name === "data" && elementos[i].value !== "" ? eventos[eventoIndex].data = data : eventos[eventoIndex].data = eventos[eventoIndex].data
+        elementos[i].name === "local" && elementos[i].value !== "" ? eventos[eventoIndex].local = local : eventos[eventoIndex].local = eventos[eventoIndex].local
+        elementos[i].name === "descricao" && elementos[i].value !== "" ? eventos[eventoIndex].descricao = descricao : eventos[eventoIndex].descricao = eventos[eventoIndex].descricao
+        elementos[i].name === "capacidade" && elementos[i].value !== "" ? eventos[eventoIndex].capacidadeTotal = capacidadeTotal : eventos[eventoIndex].capacidadeTotal = eventos[eventoIndex].capacidadeTotal
+        elementos[i].name === "mapa" && elementos[i].value !== "" ? eventos[eventoIndex].mapaUrl = mapaUrl : eventos[eventoIndex].mapaUrl = eventos[eventoIndex].mapaUrl
+        elementos[i].name === "fotos" && elementos[i].value !== "" ? eventos[eventoIndex].fotos = fotosTexto : eventos[eventoIndex].fotos = eventos[eventoIndex].fotos
+        if (elementos[i].name === "status" && elementos[i].checked === true) { eventos[eventoIndex].status = elementos[i].value === "true" }
+      }
     }
 
-    // ✅ (ADICIONADO) Converte o textarea em array de URLs
-    // Regra: 1 URL por linha, remove espaços e linhas vazias
-    const fotos = fotosTexto
-      .split("\n")
-      .map((linha) => linha.trim())
-      .filter(Boolean);
+    // Caso não tenha um evento selecionado
+    else {
+      const textArea = document.getElementById("fotosArea");
 
-    // ✅ (ADICIONADO) Dois fluxos: editar OU criar
-    if (eventoEditando) {
-      // ✅ MODO EDITAR
-      // Atualiza o evento existente mantendo id e outros dados
-      const atualizado = {
-        ...eventoEditando,
-        titulo,
-        data,
-        local,
-        descricao,
-        capacidadeTotal: cap,
+      // Separa as fotos em linhas e remove as linhas em branco
+      const fotos = textArea.value.split(/\r?\n/).filter(url => url.trim() !== "");
 
-        // ✅ (ADICIONADO) Regra de negócio:
-        // garante que vagasRestantes não fique maior que capacidadeTotal
-        vagasRestantes: Math.min(eventoEditando.vagasRestantes ?? cap, cap),
+      // Retorna true mas não é colocado no evento por algum motivo
+      console.log(status)
 
-        mapaUrl,
-        fotos,
-      };
+      // Pega as variáveis e transforma em um unico objeto para facilitar.
+      const evento = { "titulo": titulo, "data": data, "local": local, "descricao": descricao, "mapa_url": mapaUrl, "capacidade_total": capacidadeTotal, "vagas_restantes": capacidadeTotal, "status": true, "fotos": fotos }
 
-      // Chama função do componente pai para atualizar a lista
-      onAtualizar(atualizado);
 
-      // Sai do modo edição no pai
-      onCancelarEdicao();
-    } else {
-      // ✅ MODO CRIAR
-      // Cria um novo evento com vagasRestantes iniciando igual à capacidade
-      onAdd({
-        titulo,
-        data,
-        local,
-        descricao,
-        capacidadeTotal: cap,
+      fetch('http://localhost:3001/eventos', {
+        method: 'POST',
+        headers: { 'Content-type': 'application/json' },
+        body: JSON.stringify(evento)
+      })
+        .then(res => res.json())
+        .then(responseData => {
+          console.log("Evento criado:", responseData)
+          console.log("Enviado:", evento)        // what you sent
+          console.log("Recebido:", responseData) // what the server saved
+          navigate("/evento") 
+        })
+        .catch(err => console.error("Erro:", err));
 
-        // ✅ (ADICIONADO) Regra de negócio:
-        // ao criar, vagasRestantes começa igual à capacidade total
-        vagasRestantes: cap,
-
-        mapaUrl,
-        fotos,
-      });
+      onAdd({ titulo, data, local, descricao, status, mapaUrl, fotosTexto, capacidadeTotal, vagas: capacidadeTotal, fotos });
     }
 
-    // ✅ (ADICIONADO) Pós-salvar: limpa e volta para a tela de eventos
-    limpar();
-    navigate("/evento");
+    
+  }
+
+  // Função para limpar os campos do formulário
+  function limparCampos() {
+    const form = document.getElementById("formularioCadastro")
+    const elementos = form.elements;
+
+    // Limpar valores colocados
+    setData("")
+    setTitulo("")
+    setLocal("")
+    setDescricao("")
+    setFotosTexto("")
+    setCapacidadeTotal("")
+    setMapaUrl("")
+
+    // Limpar cada valor do formulário
+    for (let i = 0; i < elementos.length; i++) {
+      if (elementos[i].type === "text" || elementos[i].type === "date") {
+        elementos[i].value = ""
+      }
+    }
   }
 
   return (
     <section className="stack">
-      {/* ✅ (ADICIONADO) título muda dependendo se está editando ou criando */}
-      <h2>{eventoEditando ? "Admin: Editar Evento" : "Admin: Cadastrar Evento"}</h2>
+      <h2>Cadastrar Evento</h2>
 
-      {/* ✅ Handler do formulário ligado ao handleSubmit */}
-      <form className="form stack" onSubmit={handleSubmit}>
+      <form className="form" id="formularioCadastro" onSubmit={handleSubmit}>
         <label>
-          Título
-          <input
-            className="input"
-            value={titulo}
-            onChange={(e) => setTitulo(e.target.value)} // STATE atualiza ao digitar
-          />
+          <strong>Título </strong>
+          <input value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder={eId === undefined ? "Ex: Demo de sistemas" : eventos[eventoIndex].titulo} name="titulo" />
         </label>
 
         <label>
-          Data
-          <input
-            className="input"
-            type="date"
-            value={data}
-            onChange={(e) => setData(e.target.value)}
-          />
+          <strong>Data</strong>
+          <input type="date" value={data} onChange={(e) => setData(e.target.value)} name="data" />
         </label>
 
         <label>
-          Local
-          <input
-            className="input"
-            value={local}
-            onChange={(e) => setLocal(e.target.value)}
-          />
+          <strong>Local </strong>
+          <input type="input" value={local} onChange={(e) => setLocal(e.target.value)} placeholder={eId === undefined ? "Ex: Laboratório" : eventos[eventoIndex].local} name="local" />
         </label>
 
         <label>
-          Descrição
-          <input
-            className="input"
-            value={descricao}
-            onChange={(e) => setDescricao(e.target.value)}
-          />
+          <strong>Descrição </strong>
+          <input value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder={eId === undefined ? "Ex: Testar se o sistema esta funcionando" : eventos[eventoIndex].descricao} name="descricao" />
         </label>
 
-        {/* ✅ (ADICIONADO) Campo de capacidade */}
-        <label>
-          Capacidade total
-          <input
-            className="input"
-            type="number"
-            min={1}
-            value={capacidadeTotal}
-            onChange={(e) => setCapacidadeTotal(e.target.value)}
-            placeholder="Ex: 50"
-          />
+        <label id="status-label">
+          <strong> Status </strong>
+          <p></p>
+          Aberto
+          <p></p>
+          <input value={true} type="radio" name="status" onChange={(e) => setStatus(e.target.value === "true")} className="radio-status" />
+          <Icon icon="mynaui:door-open" inline fontSize={30}></Icon>
+          <br />
+          Lotado
+          <p></p>
+          <input value={false} type="radio" name="status" onChange={(e) => setStatus(e.target.value === "true")} className="radio-status" />
+          <Icon icon="mynaui:door-closed-locked" inline fontSize={30}></Icon>
         </label>
 
-        {/* ✅ (ADICIONADO) Campo do mapa */}
         <label>
-          Link do mapa (Google Maps embed)
-          <input
-            className="input"
-            value={mapaUrl}
-            onChange={(e) => setMapaUrl(e.target.value)}
-            placeholder="Cole um link com output=embed"
-          />
+          <strong>Capacidade total </strong>
+          <input type="number" min="0" value={capacidadeTotal} name="capacidade" onChange={(e) => setCapacidadeTotal(e.target.value)} placeholder={eId === undefined ? "10" : eventos[eventoIndex].capacidadeTotal} />
         </label>
 
-        {/* ✅ (ADICIONADO) Campo de fotos (1 URL por linha) */}
         <label>
-          Fotos (1 URL por linha)
-          <textarea
-            className="input"
-            rows={4}
-            value={fotosTexto}
-            onChange={(e) => setFotosTexto(e.target.value)}
-            placeholder={"https://...\nhttps://...\nhttps://..."}
-          />
+          <strong>Url do mapa </strong>
+          <input type="text" value={mapaUrl} name="mapa" onChange={(e) => setMapaUrl(e.target.value)} placeholder={eId === undefined ? "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4474.925816263736!2d-52.645341755023836!3d-27.1011453570486!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94e4b44f71ad42f7%3A0x95575390588d7edd!2sSENAI%20Chapec%C3%B3!5e0!3m2!1spt-BR!2sbr!4v1772214399667!5m2!1spt-BR!2sbr" : eventos[eventoIndex].mapaUrl} />
+        </label>
+
+        <label>
+          <strong>Fotos
+            (Use links) </strong>
+          <textarea type="number" value={fotosTexto} name="fotos" onChange={(e) => setFotosTexto(e.target.value)} className="areaText" id="fotosArea" placeholder={eId === undefined ? "https://picsum.photos/200" : eventos[eventoIndex].fotos} />
         </label>
 
         <div className="row">
-          {/* ✅ (ADICIONADO) texto do botão muda no modo edição */}
-          <button className="btn" type="submit">
-            {eventoEditando ? "Salvar alterações" : "Salvar"}
-          </button>
-
-          {/* ✅ (ADICIONADO) botões auxiliares */}
-          <button className="btn ghost" type="button" onClick={limpar}>
-            Limpar Formulário
-          </button>
-
-          <button className="btn ghost" type="button" onClick={cancelar}>
+          <button className="btn" type="submit">Salvar</button>
+          <button className="btn ghost" type="button" onClick={() => navigate("/evento")}>
             Cancelar
+          </button>
+          <button className="btn danger" type="button" onClick={() => limparCampos()}>
+            Limpar formulário
           </button>
         </div>
       </form>
+
+      <p className="muted">
+        Macete: input controlado = valor vem do state e muda no onChange.
+      </p>
     </section>
   );
 }
